@@ -1,23 +1,54 @@
 import React from 'react'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 import { DoctorContext } from '../../context/DoctorContext'
 import { AppContext } from '../../context/AppContext'
 import { assets } from '../../assets/assets'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const DoctorAppointments = () => {
 
   const { dToken, appointments, getAppointments, cancelAppointment, completeAppointment } = useContext(DoctorContext)
   const { slotDateFormat, calculateAge, currency } = useContext(AppContext)
+  
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const navigate = useNavigate();
+  const [currentAppointmentId, setCurrentAppointmentId] = useState(null);
+  const [prescriptionText, setPrescriptionText] = useState('');
+
 
   useEffect(() => {
     if (dToken) {
       getAppointments()
     }
   }, [dToken])
+  
+  const handleWritePrescription = (appointmentId) => {
+    navigate(`/write-prescription/${appointmentId}`);
+    setShowPrescriptionModal(true);
+  };
 
-  return (
-    <div className='w-full max-w-6xl m-5 '>
+  const handlePrescriptionInputChange = (event) => {
+    setPrescriptionText(event.target.value);
+  };  return (
+  const submitPrescription = async () => {
+    try {
+      const response = await axios.post('/api/doctor/write-prescription', {
+        appointmentId: currentAppointmentId,
+        prescription: prescriptionText
+      }, {
+        headers: {
+          token: dToken
+        }
+      });
+      toast.success(response.data.message);
+      setShowPrescriptionModal(false);
+      setPrescriptionText('');
+      getAppointments(); // Refresh the appointments list
+    } catch (error) {
+      toast.error(error.response.data.message || error.message);
+    }  };  return (    <div className='w-full max-w-6xl m-5 '>
 
       <p className='mb-3 text-lg font-medium'>All Appointments</p>
 
@@ -81,6 +112,14 @@ const DoctorAppointments = () => {
       ) : item.isCompleted ? (
         <p className='text-green-500 text-xs font-medium'>Completed</p>
       ) : (
+        <div className='flex gap-2 flex-col sm:flex-row'>
+          {!item.cancelled && !item.isCompleted && (
+            <button
+              onClick={() => handleWritePrescription(item._id)}
+              className='text-primary text-xs font-medium'
+            >Write Prescription</button>
+          )}
+
         <div className='flex gap-2'>
           <img
             onClick={() => cancelAppointment(item._id)}
@@ -94,6 +133,7 @@ const DoctorAppointments = () => {
             src={assets.tick_icon}
             alt="Complete"
           />
+        </div>
         </div>
       )}
     </div>

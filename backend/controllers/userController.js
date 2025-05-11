@@ -343,6 +343,22 @@ const verifyStripe = async (req, res) => {
 
 }
 
+const viewPrescription = async (req, res) => {
+    try {
+        const { appointmentId } = req.params;
+        const appointment = await appointmentModel.findById(appointmentId).select('prescription');
+
+        if (!appointment) {
+            return res.json({ success: false, message: 'Appointment not found' });
+        }
+
+        res.json({ success: true, prescription: appointment.prescription });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
 export {
     loginUser,
     registerUser,
@@ -350,7 +366,7 @@ export {
     updateProfile,
     bookAppointment,
     listAppointment,
-    cancelAppointment,
+    cancelAppointment,    viewPrescription,
     paymentRazorpay,
     verifyRazorpay,
     paymentStripe,

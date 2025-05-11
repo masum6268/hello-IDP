@@ -190,6 +190,24 @@ const doctorDashboard = async (req, res) => {
     }
 }
 
+// Add a new async function called `writePrescription`
+const writePrescription = async (req, res) => {
+    try {
+        const { appointmentId, prescription } = req.body;
+        const appointment = await appointmentModel.findById(appointmentId);
+        if (appointment) {
+            appointment.prescription = prescription;
+            await appointment.save();
+            res.json({ success: true, message: "Prescription saved successfully." });
+        } else {
+            res.json({ success: false, message: "Appointment not found." });
+        }
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
 export {
     loginDoctor,
     appointmentsDoctor,
@@ -199,5 +217,6 @@ export {
     appointmentComplete,
     doctorDashboard,
     doctorProfile,
-    updateDoctorProfile
+    updateDoctorProfile,
+    writePrescription // Export the new function
 }

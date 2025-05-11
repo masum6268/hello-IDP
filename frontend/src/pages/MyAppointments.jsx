@@ -13,6 +13,8 @@ const MyAppointments = () => {
 
     const [appointments, setAppointments] = useState([])
     const [payment, setPayment] = useState('')
+    const [showPrescriptionModal, setShowPrescriptionModal] = useState(false)
+    const [currentPrescription, setCurrentPrescription] = useState('')
 
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -85,6 +87,10 @@ const MyAppointments = () => {
         rzp.open();
     };
 
+    const handleViewPrescription = (id, prescriptionText) => {
+        setShowPrescriptionModal(true)
+    }
+
     // Function to make payment using razorpay
     const appointmentRazorpay = async (appointmentId) => {
         try {
@@ -126,6 +132,28 @@ const MyAppointments = () => {
 
     return (
         <div>
+            {/* Prescription Modal */}
+            {showPrescriptionModal && (
+                <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+                    <div className='bg-white p-6 rounded-lg w-full max-w-md'>
+                        <h2 className='text-lg font-semibold mb-4'>Prescription</h2>
+                        <p className='text-gray-700 whitespace-pre-wrap'>{currentPrescription}</p>
+                        <button onClick={() => setShowPrescriptionModal(false)} className='mt-6 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600'>Close</button>
+                    </div>
+                </div>
+            )}
+            {/* Prescription Modal */}
+            {showPrescriptionModal && (
+                <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+                    <div className='bg-white p-6 rounded-lg w-full max-w-md'>
+                        <h2 className='text-lg font-semibold mb-4'>Prescription</h2>
+                        <p className='text-gray-700 whitespace-pre-wrap'>{currentPrescription}</p>
+                        <button onClick={() => setShowPrescriptionModal(false)} className='mt-6 px-4 py-2 bg-primary text-white rounded hover:bg-blue-600'>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
             <p className='pb-3 mt-12 text-lg font-medium text-gray-600 border-b'>My appointments</p>
             <div className=''>
                 {appointments.map((item, index) => (
@@ -144,7 +172,7 @@ const MyAppointments = () => {
                         <div></div>
                         <div className='flex flex-col gap-2 justify-end text-sm text-center'>
                              <Link to={`my-videocall/${item.userId}`} >Join Video Call</Link>
-                            {!item.prescription ? <p className='text-[#696969] '>No Prescription</p> : <p className='text-[#696969] '>Prescription : {item.prescription}</p> }
+                            {item.prescription && <button onClick={() => handleViewPrescription(item._id, item.prescription)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300'>View Prescription</button>}
                             {!item.cancelled && !item.payment && !item.isCompleted && payment !== item._id && <button onClick={() => setPayment(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300'>Pay Online</button>}
                             {!item.cancelled && !item.payment && !item.isCompleted && payment === item._id && <button onClick={() => appointmentStripe(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-gray-100 hover:text-white transition-all duration-300 flex items-center justify-center'><img className='max-w-20 max-h-5' src={assets.stripe_logo} alt="" /></button>}
                             {!item.cancelled && !item.payment && !item.isCompleted && payment === item._id && <button onClick={() => appointmentRazorpay(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-gray-100 hover:text-white transition-all duration-300 flex items-center justify-center'><img className='max-w-20 max-h-5' src={assets.razorpay_logo} alt="" /></button>}

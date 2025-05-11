@@ -16,6 +16,7 @@ import DoctorDashboard from './pages/Doctor/DoctorDashboard';
 import DoctorProfile from './pages/Doctor/DoctorProfile';
 import VideoCall from './pages/Doctor/VideoCall';
 import AgoraRTC, { AgoraRTCProvider } from "agora-rtc-react";
+import WritePrescription from './pages/Doctor/WritePrescription';
 
 
 const App = () => {
@@ -41,6 +42,7 @@ const App = () => {
           <Route path='/doctor-appointments' element={<DoctorAppointments />} />
           <Route path='/doctor-profile' element={<DoctorProfile />} />
           <Route path='/video-call/:id' element={<VideoCall />} />
+          <Route path='/write-prescription/:appointmentId' element={<WritePrescription />} />
         </Routes>
       </div>
     </div>
